@@ -157,8 +157,8 @@ extension DreamCalendarViewController {
             let predicate = NSPredicate(format: "%@ =< date AND date < %@", getBeginingAndEndOfDay(date).begining as CVarArg, getBeginingAndEndOfDay(date).end as CVarArg)
             tmpList = realm.objects(Dream.self).filter(predicate)
         }
-        catch {
-        }
+//        catch {
+//        }
         return tmpList.count
     }
 
