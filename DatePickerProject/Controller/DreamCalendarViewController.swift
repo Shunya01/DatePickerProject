@@ -104,14 +104,19 @@ extension DreamCalendarViewController {
     // 選択した日付の取得
      func calendar(_ calendar: FSCalendar, didSelect selectDate: Date, at monthPosition: FSCalendarMonthPosition) {
         let newDate = selectDate.addingTimeInterval(TimeInterval(NSTimeZone.local.secondsFromGMT()))
+        print(newDate)
+//        //Realmに接続する
+//        let realm = try! Realm()
+//        //Dreamの全てを並び替えて取得する
+//        let resultDream = realm.objects(Dream.self).filter("date == %@", newDate)
         
-        //Realmに接続する
+        var tmpList: Results<Dream>?
         let realm = try! Realm()
-        //Dreamの全てを並び替えて取得する
-        let resultDream = realm.objects(Dream.self).filter("dream!.date == %@", newDate)
-    
+        let predicate = NSPredicate(format: "%@ =< date AND date < %@", getBeginingAndEndOfDay(newDate).begining as CVarArg, getBeginingAndEndOfDay(newDate).end as CVarArg)
+        tmpList = realm.objects(Dream.self).filter(predicate)
+        print(tmpList)
         //  日付選択時に詳細画面に遷移する
-        performSegue(withIdentifier: "toDetail", sender: resultDream)
+        performSegue(withIdentifier: "toDetail", sender: tmpList)
     }
     
     // カレンダーの日付を選択したときにHistoryViewControllerに選択した日付の情報を送る
@@ -121,6 +126,14 @@ extension DreamCalendarViewController {
             nextVC.dream = sender as? Dream
         }
     }
+    
+    // 日の始まりと終わりを取得
+    private func getBeginingAndEndOfDay(_ date:Date) -> (begining: Date , end: Date) {
+        let begining = Calendar(identifier: .gregorian).startOfDay(for: date)
+        let end = begining + 24 * 60 * 60
+        return (begining, end)
+    }
+    
     
     
 }
@@ -170,12 +183,12 @@ extension DreamCalendarViewController {
         return tmpList.count
     }
 
-    // 日の始まりと終わりを取得
-    private func getBeginingAndEndOfDay(_ date:Date) -> (begining: Date , end: Date) {
-        let begining = Calendar(identifier: .gregorian).startOfDay(for: date)
-        let end = begining + 24 * 60 * 60
-        return (begining, end)
-    }
+//    // 日の始まりと終わりを取得
+//    private func getBeginingAndEndOfDay(_ date:Date) -> (begining: Date , end: Date) {
+//        let begining = Calendar(identifier: .gregorian).startOfDay(for: date)
+//        let end = begining + 24 * 60 * 60
+//        return (begining, end)
+//    }
 
 
 

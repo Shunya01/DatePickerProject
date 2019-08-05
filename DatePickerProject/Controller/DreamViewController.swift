@@ -70,6 +70,8 @@ extension DreamViewController:UITableViewDelegate,UITableViewDataSource{
         //選択されたものを取得
         let dream = dreams[indexPath.row]
         
+        print(dream)
+        
         performSegue(withIdentifier: "toDetail", sender: dream)
     }
     

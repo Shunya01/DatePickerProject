@@ -23,9 +23,14 @@ class DreamDetailViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        print(dream)
+        
         let dateformatter = DateFormatter()
         dateformatter.dateFormat = "yyyy年MM月dd日"
         let Dreamdate = dateformatter.string(from: dream!.date)
+        
+        
         
         dateLabel.text = Dreamdate
         titleLabel.text = dream?.title
