@@ -17,15 +17,17 @@ class DreamDetailViewController: UIViewController {
     
     //前の画面から渡されてきたDreamを受け取る変数
     var dream: Dream? = nil
-    
-    var date:Date? = nil
 
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        dateLabel.text = dream?.date
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat = "yyyy年MM月dd日"
+        let Dreamdate = dateformatter.string(from: dream!.date)
+        
+        dateLabel.text = Dreamdate
         titleLabel.text = dream?.title
         detailLabel.text = dream?.content
     }

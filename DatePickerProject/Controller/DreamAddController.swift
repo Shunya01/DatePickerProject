@@ -45,11 +45,8 @@ class DreamAddController: UIViewController {
             //テキストに編集前の値をセット
             dreamTextField.text = dream?.title
             dreamTextView.text = dream?.content
-            
-            //dream?.dateがString型なのでdate型に変更。編集前の値をセットする。
-            let dateformatter = DateFormatter()
-            dateformatter.dateFormat = "yyyy年MM月dd日"
-            datePicker.date = dateformatter.date(from: dream!.date)!
+            //編集前の日付をセットする。
+            datePicker.date = dream!.date
             //ボタンの名前を”夢編集”へと変える
             dreamButton.setTitle("夢編集", for: .normal)
         }
@@ -84,10 +81,8 @@ class DreamAddController: UIViewController {
             return
         }
         
-        //datepickerの形を編集してstring型で取得
-        let dateformatter = DateFormatter()
-        dateformatter.dateFormat = "yyyy年MM月dd日"
-        let date = dateformatter.string(from: datePicker.date)
+        //datePickerの値をdateの変数に入れる
+        let date = datePicker.date
         
         //追加ボタンが押されている時
         if dream == nil{

@@ -96,26 +96,33 @@ class DreamCalendarViewController: UIViewController,FSCalendarDelegate,FSCalenda
         return nil
     }
     
-    // カレンダーの日付を選択したときにHistoryViewControllerに選択した日付の情報を送る
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "toDetail" {
-            let nextVC = segue.destination as! DreamDetailViewController
-            nextVC.date = sender as? Date
-        }
-    }
-    
-    
 }
 
 //  FSCalendarの日付に関する処理
 extension DreamCalendarViewController {
     
     // 選択した日付の取得
-    func GetDate(_ calendar: FSCalendar, didSelect selectDate: Date, at monthPosition: FSCalendarMonthPosition) {
+     func calendar(_ calendar: FSCalendar, didSelect selectDate: Date, at monthPosition: FSCalendarMonthPosition) {
         let newDate = selectDate.addingTimeInterval(TimeInterval(NSTimeZone.local.secondsFromGMT()))
+        
+        //Realmに接続する
+        let realm = try! Realm()
+        //Dreamの全てを並び替えて取得する
+        let resultDream = realm.objects(Dream.self).filter("dream!.date == %@", newDate)
+    
         //  日付選択時に詳細画面に遷移する
-        performSegue(withIdentifier: "toDetail", sender: newDate)
+        performSegue(withIdentifier: "toDetail", sender: resultDream)
     }
+    
+    // カレンダーの日付を選択したときにHistoryViewControllerに選択した日付の情報を送る
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toDetail" {
+            let nextVC = segue.destination as! DreamDetailViewController
+            nextVC.dream = sender as? Dream
+        }
+    }
+    
+    
 }
 
 
@@ -141,9 +148,10 @@ extension DreamCalendarViewController {
         var recordDays: [String] = []
         //同じ日付が変数に入っていなければ、入れない
         for dream in resultDream {
-            if !recordDays.contains(dream.date)  {
-                recordDays.append(dream.date)
+            if !recordDays.contains(formatter.string(from: dream.date))  {
+                recordDays.append(formatter.string(from: dream.date))
             }
+            
         }
     }
     

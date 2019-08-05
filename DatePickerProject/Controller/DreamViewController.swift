@@ -20,7 +20,7 @@ class DreamViewController: UIViewController  {
         super.viewDidLoad()
        tableView.delegate = self
        tableView.dataSource = self
-        
+    
         print(Realm.Configuration.defaultConfiguration.fileURL!)
     }
     
@@ -52,8 +52,13 @@ extension DreamViewController:UITableViewDelegate,UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let dream = dreams[indexPath.row]
         
+        //dream.dateはDate型なのでString型へ変更する
+        let dateformatter = DateFormatter()
+        dateformatter.dateFormat = "yyyy年MM月dd日"
+        let dreamDate = dateformatter.string(from: dream.date)
+        
         //セルのテキストにはタイトルと日付をセット
-        cell.textLabel?.text = "\(dream.title) : \(dream.date)"
+        cell.textLabel?.text = "\(dream.title) : \(dreamDate)"
         
         //セルに矢印をつける（他にも種類あり）
         cell.accessoryType = .disclosureIndicator
@@ -82,6 +87,7 @@ extension DreamViewController:UITableViewDelegate,UITableViewDataSource{
         }
     }
     
+    //選択したdreamをスワイプで削除する処理
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         //Realmから対象のdreamを削除

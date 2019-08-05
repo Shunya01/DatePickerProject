@@ -16,5 +16,5 @@ class Dream: Object {
     //内容
     @objc dynamic var content:String = ""
     //日付
-    @objc dynamic var date = NSDate()
+    @objc dynamic var date:Date = Date()
 }
