@@ -24,10 +24,8 @@ class DreamAddController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //Realmのブラウザを開く際のURLを表示させるためのもの
-        print(Realm.Configuration.defaultConfiguration.fileURL!)
         
-        //日付の最大を今日にしている
+        //datePickerの日付の最大を今日にしている
         datePicker.maximumDate = NSDate() as Date
         
         //textViewに黒色の枠線をつける
@@ -66,7 +64,7 @@ class DreamAddController: UIViewController {
         //タイトルまたは詳細欄が空文字の場合
         if dreamTextField.text!.isEmpty || dreamTextView.text!.isEmpty{
             //alertで入力不足を通知
-            let alert = UIAlertController(title: "入力不足", message: "タイトル欄または詳細欄が入力されていません。入力してください。", preferredStyle: .alert)
+            let alert = UIAlertController(title: "⚠️入力不足", message: "タイトル欄または詳細欄が入力されていません。入力してください。", preferredStyle: .alert)
             //選択肢を作る
             let yesAction = UIAlertAction(title: "OK", style: .default) {
                 (UIAlertAction) in
@@ -139,7 +137,7 @@ class DreamAddController: UIViewController {
                 //アラートが消えるのと画面遷移が重ならないように0.5秒後に画面遷移するようにしてる
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     // 0.5秒後に実行したい処理
-                    //NavigationControllerの持っている履歴から１つ前の画面に戻る
+                    //NavigationControllerの持っている履歴からツリーのトップの画面に戻る
                     self.navigationController?.popToRootViewController(animated: true)
                 }
             }

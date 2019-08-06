@@ -14,10 +14,12 @@ class StartViewController: UIViewController {
    
     @IBOutlet weak var imageView: UIImageView!
     
+    // 初期表示時に必要な処理を設定する。
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
+    // 画面に表示された直後に呼ばれる。
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         

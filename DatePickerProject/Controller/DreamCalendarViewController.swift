@@ -101,25 +101,38 @@ class DreamCalendarViewController: UIViewController,FSCalendarDelegate,FSCalenda
 //  FSCalendarの日付に関する処理
 extension DreamCalendarViewController {
     
-    // 選択した日付の取得
-     func calendar(_ calendar: FSCalendar, didSelect selectDate: Date, at monthPosition: FSCalendarMonthPosition) {
-        let newDate = selectDate.addingTimeInterval(TimeInterval(NSTimeZone.local.secondsFromGMT()))
-        print(newDate)
-//        //Realmに接続する
+//    // 選択した日付の取得
+//     func calendar(_ calendar: FSCalendar, didSelect selectDate: Date, at monthPosition: FSCalendarMonthPosition) {
+//        let newDate = selectDate.addingTimeInterval(TimeInterval(NSTimeZone.local.secondsFromGMT()))
+//        print(newDate)
+////        //Realmに接続する
+////        let realm = try! Realm()
+////        //Dreamの全てを並び替えて取得する
+////        let resultDream = realm.objects(Dream.self).filter("date == %@", newDate)
+//
+//        var tmpList: Results<Dream>?
 //        let realm = try! Realm()
-//        //Dreamの全てを並び替えて取得する
-//        let resultDream = realm.objects(Dream.self).filter("date == %@", newDate)
-        
-        var tmpList: Results<Dream>?
+//        let predicate = NSPredicate(format: "%@ =< date AND date < %@", getBeginingAndEndOfDay(newDate).begining as CVarArg, getBeginingAndEndOfDay(newDate).end as CVarArg)
+//        tmpList = realm.objects(Dream.self).filter(predicate)
+//        print(tmpList)
+//        //  日付選択時に詳細画面に遷移する
+//        performSegue(withIdentifier: "toDetail", sender: tmpList)
+//    }
+    
+    // 選択した日付を取得してその詳細ページにとべるようにする
+    func calendar(_ calendar: FSCalendar, didSelect selectDate: Date, at monthPosition: FSCalendarMonthPosition) {
+        let newDate = selectDate.addingTimeInterval(TimeInterval(NSTimeZone.local.secondsFromGMT()))
+        //Realmに接続する
         let realm = try! Realm()
+        //日付を範囲で取得するようにする
         let predicate = NSPredicate(format: "%@ =< date AND date < %@", getBeginingAndEndOfDay(newDate).begining as CVarArg, getBeginingAndEndOfDay(newDate).end as CVarArg)
-        tmpList = realm.objects(Dream.self).filter(predicate)
-        print(tmpList)
-        //  日付選択時に詳細画面に遷移する
+        //Realmからfilterを用いてその日付のものを取得する
+        let tmpList = realm.objects(Dream.self).filter(predicate).reversed()[0]
+        //日付選択時に詳細画面に遷移する
         performSegue(withIdentifier: "toDetail", sender: tmpList)
     }
     
-    // カレンダーの日付を選択したときにHistoryViewControllerに選択した日付の情報を送る
+    // カレンダーの日付を選択したときにDreamDetailViewControllerに選択した日付のRealmの情報を送る
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toDetail" {
             let nextVC = segue.destination as! DreamDetailViewController
@@ -127,20 +140,17 @@ extension DreamCalendarViewController {
         }
     }
     
-    // 日の始まりと終わりを取得
+    // 日の始まりと終わりを取得するために使う関数
     private func getBeginingAndEndOfDay(_ date:Date) -> (begining: Date , end: Date) {
         let begining = Calendar(identifier: .gregorian).startOfDay(for: date)
         let end = begining + 24 * 60 * 60
         return (begining, end)
     }
     
-    
-    
 }
 
 
-
-//  Realmに関する処理
+//総記録数とカレンダーに丸を入れる処理
 extension DreamCalendarViewController {
     
     //記録されたDreamの数を取得し表示させるメソッド
@@ -149,27 +159,27 @@ extension DreamCalendarViewController {
         let realm = try! Realm()
         //Dreamの全てを並び替えて取得する
         let resultDream = realm.objects(Dream.self).sorted(byKeyPath: "date", ascending: true)
-        //取得したPositivesの数をカウントして代入
+        //取得したDreamの数をカウントしてテキストで表示させる
         countLabel.text = String(resultDream.count)
         
-        //日付の形を定義するための定数を定義する
-        let formatter = DateFormatter()
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)!
-        //"yyyy/MM/dd"の形にするための宣言
-        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yyyy/MM/dd", options: 0, locale: Locale(identifier: "ja_JP"))
-        //  記録されているDreamsの日付を取得して変数に入れる
-        var recordDays: [String] = []
-        //同じ日付が変数に入っていなければ、入れない
-        for dream in resultDream {
-            if !recordDays.contains(formatter.string(from: dream.date))  {
-                recordDays.append(formatter.string(from: dream.date))
-            }
-            
-        }
+//        //日付の形を定義するための定数を定義する
+//        let formatter = DateFormatter()
+//        formatter.timeZone = TimeZone(secondsFromGMT: 0)!
+//        //"yyyy/MM/dd"の形にするための宣言
+//        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yyyy/MM/dd", options: 0, locale: Locale(identifier: "ja_JP"))
+//        //  記録されているDreamsの日付を取得して変数に入れる
+//        var recordDays: [String] = []
+//        //同じ日付が変数に入っていなければ、入れない
+//        for dream in resultDream {
+//            if !recordDays.contains(formatter.string(from: dream.date))  {
+//                recordDays.append(formatter.string(from: dream.date))
+//            }
+//
+//        }
     }
     
     
-//  RealmDBから日付が最初(0時）と最後(24時)の間で設定されているデータを取得し、そのデータの数を返すようにすることで任意の日付に任意の数の点マークがつけられるようになる。
+//RealmDBから日付が最初(0時）と最後(24時)の間で設定されているデータを取得し、そのデータの数を返すようにすることで任意の日付に任意の数の点マークがつけられるようになる。
     func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int{
         var tmpList: Results<Dream>!
         // 対象の日付が設定されているデータを取得する
@@ -182,15 +192,6 @@ extension DreamCalendarViewController {
 //        }
         return tmpList.count
     }
-
-//    // 日の始まりと終わりを取得
-//    private func getBeginingAndEndOfDay(_ date:Date) -> (begining: Date , end: Date) {
-//        let begining = Calendar(identifier: .gregorian).startOfDay(for: date)
-//        let end = begining + 24 * 60 * 60
-//        return (begining, end)
-//    }
-
-
 
 }
 
